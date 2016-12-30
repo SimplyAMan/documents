@@ -12,6 +12,28 @@
 
 В наименовании процедур, функций, переменных, констант и т.д. необходимо использовать [CamelCase](https://ru.wikipedia.org/wiki/CamelCase).
 
+После ключевого слова END, окончание пакета, процедуры или функции, необходимо прописывать наименование пакета/процедуры/функции.
+
+В коде необходимо избегать использования [магических чисел](https://ru.wikipedia.org/wiki/%D0%9C%D0%B0%D0%B3%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5_%D1%87%D0%B8%D1%81%D0%BB%D0%BE_(%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5)) заменяя их на константы. При этом крайне желательно чтобы по наименованию константы можно было узнать её предназначение.
+
+Например, код:
+``` sql
+SELECT d.Id
+  FROM Deal d
+ WHERE d.DealTypeId = 356
+   AND d.DealState in (0,1)
+   AND d.ContragentId = lContragentId;
+```
+
+необходимо заменять на
+``` sql
+SELECT d.Id
+  FROM Deal d
+ WHERE d.DealTypeId = pkc_Deal.ldtLoanOnTime
+   AND d.DealState IN (pkc_Deal.DS_NotStarted,pkc_Deal.DS_Active)
+   AND d.ContragentId = lContragentId;
+```
+
 Если в процесе работы над заявкой изменяется объект форматирование которого не соответсвует требованиям этого документа необходимо привести форматирование изменяемого объекта к актуальным требованиям по форматированию. При этом если изменяется только одна, или несколько функций/процедур пакета, то корректируется только их форматирование.
 
 Например:
@@ -59,22 +81,46 @@
 - код и комментарий выровнены по блоках
 
 ``` sql
-  lId            Aaccount.Id%TYPE;
-  lErrorMessage  VARCHAR2(4000);
-BEGIN
-  -- нам нужен код счета
-  SELECT Id
-    INTO lId
-    FROM Aaccount aa
-   WHERE aa.ACCOUNTNO = pAccountNo
-     AND aa.currencyId = pCurrencyid;
-   
-EXCEPTION
-  WHEN NO_DATA_FOUND THEN
-    lErrorMessage := 'описание ошибки';
-    eprsyslog_insert2(lErrorMessage,99);
-    RAISE;  
-END ProcedureName;  
+  FUNCTION Uses_Summa_OnDealTranche (
+    in_DealId        NUMBER,
+    in_Account       VARCHAR2,
+    in_Date          DATE,
+    in_CurrencyId    NUMBER DEFAULT NULL)
+  RETURN NUMBER
+  IS
+    lResult   NUMBER;
+  BEGIN
+    IF in_Account IS NOT NULL THEN
+      BEGIN
+        SELECT NVL (SUM (IncSumma - DecSumma), 0)
+          INTO lResult
+          FROM (SELECT ddt.DealId,
+                       ddt.ValueDate,
+                       DECODE (ddt.OTBS, 0, ddt.UseSumma, 0) IncSumma,
+                       DECODE (ddt.OTBS, 1, ddt.UseSumma, 0) DecSumma,
+                       ddt.OTBS
+                  FROM Deal td,
+                       DealDocTransaction ddt,
+                       Aaccount a,
+                       DealCommercialTranche dct
+                 WHERE td.ID = ddt.DealId
+                   AND td.ValueDate <= in_Date
+                   AND ddt.ValueDate <= in_Date
+                   AND ddt.AccountId = a.ID
+                   AND a.AccountNo = in_Account
+                   AND a.CurrencyId = NVL (in_CurrencyId, dct.CurrencyId)
+                   AND dct.DealId = in_DealId
+                   AND td.Id = dct.DealId);
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          lResult := 0;
+      END;
+    ELSE
+      lResult := 0;
+    END IF;
+
+    RETURN lResult;
+  END Uses_Summa_OnDealTranche;
 ```
 
 ### Отступы, выравнивание, границы строки, переносы
@@ -149,12 +195,6 @@ TheProc(param1,
         param2, 
         param3,
        );
-```
-
-Не рекомендуется ставить круглые скобки в конструкциях, где они не необходимы и не делают код читабельнее, например в простейших операторах IF:
-
-``` sql
-if (a < b) then – скобки здесь излишни !
 ```
 
 При записи длинных констант-строк оператор конкатенации появляется только в том случае, если строка выходит за границу сраницы справа (80 символов от левого края). Желательно переносить оператор конкатенации на новую строку, а не оставлять на предыдущей. Такой код проще читать и комментировать.
@@ -303,6 +343,7 @@ dmbs_output.put_line(
 | **Reports**    | Внутрибанковские отчеты                             |
 | **SD**         | Содержит скрипты исправлений инцедентов             |
 | **Tools**      | Содержит скрипты для загрузки дампов, создания простых задач, и т.д. |
+
 
 
 #### Общие требования к DDL объектов (trunc/OBJ)
@@ -507,6 +548,9 @@ Individual developers should never waste their time calling DBMS_UTILITY.FORMAT_
 - Stop writing so much SQL! Every SQL statement is a hard-coding of the current data structures. Don't repeat the same logical SQL statement. Keep SQL out of application-level code entirely. Instead, generate/build and rely on APIs (tablelevel, transaction-level) that hide SQL statements behind procedures and functions.
 - Write tiny, little chunks of code (J). Use top-down design, combined with reusable code and local subprograms (procedures and functions declared within another procedure or function), to make sure that your executable sections have no more than 50 lines of code in them. Define your subprograms at the package level if they need to be used by more than one program in that package or outside of that package.
 -  I also recommend that you avoid any OUT or IN OUT parameters for a function – it should return information only through the RETURN clause. If the function needs to return multiple values, group those values together as a record type and return a record based on that type. If such a transformation seems unnatural then maybe you should be writing a procedure.
+
+- не допускается использование нескольких возвращаемых значений в функциях. Для таких случаев необходимо использовать процедуры
+- в функциях точка возврата значения должна быть одна
 
 ## Литература
 
