@@ -23,6 +23,29 @@ Pros:
 Conts:
 - вимагає деяких знань в мові програмування Ruby
 
+Проблеми (для подальшого аналізу):
+``` ruby
+# encoding: utf-8
+
+require 'rspec'
+require 'rubygems'
+require 'ruby-plsql'
+require './spec/fma_utils'
+
+plsql.connection = OCI8.new('creator/f77f@b2testf.world')
+plsql.eprlogin_second
+
+puts plsql.pkc_fm.fma_dateoffirstacctclient
+puts plsql.pkg_common.getsystemparamdef('FMA_DATEOFFIRSTACCTCLIENT', '0')
+```
+
+framework свариться на **plsql.pkc_fm.fma_dateoffirstacctclient**:
+```
+C:/Ruby22/lib/ruby/gems/2.2.0/gems/ruby-plsql-0.6.0/lib/plsql/package.rb:84:in `method_missing': No PL/SQL procedure or variable 'FMA_DATEOFFIRSTACCTCLIENT' found (ArgumentError)
+```
+
+а **plsql.pkg_common.getsystemparamdef('FMA_DATEOFFIRSTACCTCLIENT', '0')** проходить без проблем.
+
 ## Code Tester for Oracle
 
 [Code Tester for Oracle – a component of the Toad Development Suite for Oracle](http://www.toadworld.com/products/code-tester)
