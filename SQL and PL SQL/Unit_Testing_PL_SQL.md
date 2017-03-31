@@ -1,5 +1,19 @@
 # Вибір framework для unit testing
 
+## Загальні дані
+
+Автоматизавані тести надають нам почуття впевненості що наша розробка працює як і було заплановано. Автоматизація надає можливість запускати тести необхідну кількість раз, причому проходження unit тестів показує розробнику що його зміни не поламали нічого що він не планував змінювати.
+
+Це також означає, що якщо розробник виконує зміни в коді, то це має відобразитись в не пройдених тестах. Очікування що тест не буде пройдено і порівняння наших очікувань з результатами тестів дає нам підказку де ми могли не зрозуміти існуючий код, чи вплив наших змін на існуючий код.
+
+Unit тести використовуються в розробці при Test Driven Development (TDD).
+
+Використовуючи TDD спочатку потрібно написати unit тести для перевірки функціоналу який ви реалізуєте. Спочатку всі ці тести мають не працювати і тоді потрібно написати код що буде проходити тести.
+
+Ключовим в TDD є те, що ви маєте написати рівно стільки коду, щоб пройти тести. Не має бути іншого, зайвого коду. Коли всі тести пройдено, потрібно зробити рефакторінг коду для очистки його і почати цикл знову з написання нового тесту.
+
+[Зачем нужны юнит-тесты](https://tproger.ru/translations/unit-tests-purposes/) - це переклад статті [Purposes of Unit Tests](http://arne-mertz.de/2015/05/purposes-of-unit-tests/) (сайт містить кілька статтей по юніт тестуванню і інших технологіях)
+
 ## Побажання
 
 ## utPLSQL
@@ -16,11 +30,15 @@
 
 [Test Drive your Oracle database. Yes, it’s doable. And it’s fun!](http://www.oraclethoughts.com/testing/test-drive-your-oracle-database-yes-its-doable-and-its-fun/)
 
+[Testing Times – using ruby-plsql-spec for testing PL/SQL](https://mikesmithers.wordpress.com/2016/11/13/testing-times-using-ruby-plsql-spec-for-testing-plsql/)
+
 Pros:
+
 - максимальна гнучкість
 - скрипти можна зберігати в VCS (SVN, Git)
 
 Conts:
+
 - вимагає деяких знань в мові програмування Ruby
 
 Проблеми (для подальшого аналізу):
@@ -46,6 +64,7 @@ C:/Ruby22/lib/ruby/gems/2.2.0/gems/ruby-plsql-0.6.0/lib/plsql/package.rb:84:in `
 
 а **plsql.pkg_common.getsystemparamdef('FMA_DATEOFFIRSTACCTCLIENT', '0')** проходить без проблем.
 
+
 ## Code Tester for Oracle
 
 [Code Tester for Oracle – a component of the Toad Development Suite for Oracle](http://www.toadworld.com/products/code-tester)
@@ -60,6 +79,7 @@ Conts:
 [SQL Developer: Unit Testing](http://docs.oracle.com/cd/E55747_01/appdev.41/e55591/sql-developer-unit-testing.htm#f1_unittesting_html)
 
 Old:
+
 - [Create a Unit Test Repositor](http://www.oracle.com/webfolder/technetwork/tutorials/obe/db/sqldev/r40/mod2_sqldev_v4/mod2_sqldev_v4.html#section6)
 - [Create and Running a Unit Test](http://www.oracle.com/webfolder/technetwork/tutorials/obe/db/sqldev/r40/mod2_sqldev_v4/mod2_sqldev_v4.html#section7)
 
@@ -70,7 +90,7 @@ Pros:
 
 Conts:
 - повільно працює відображення об'єктів при створенні теста
-- тяжко вияснити причину чому тест не проходить (не можна добавити відладочнку інформацію)
+- тяжко вияснити причину чому тест не проходить (не можна добавити відладочну інформацію)
 Наприклад, виникає помилка:
 
 ```
@@ -104,7 +124,9 @@ ORA-06512: на  line 2
 
 Дані для теста формуються динамічно з таблиці і не зрозуміло через які дані виникло виключення.
 
-Додаткова документація:
+## Додаткова документація
+
 - [that JEFF SMITH. Optimizing your Oracle Database experience, mostly](http://www.thatjeffsmith.com/)
 - [Unit Testing Stored Procedures](http://brainbaking.com/unit-testing-stored-procedures/)
 - [SQL Test Driven Development with Oracle RDBMS](http://engineering.pivotal.io/post/oracle-sql-tdd/)
+- [Automated Testing Frameworks and General Rule-Breaking in PL/SQL](https://mikesmithers.wordpress.com/2017/01/07/automated-testing-frameworks-and-general-rule-breaking-in-plsql)
