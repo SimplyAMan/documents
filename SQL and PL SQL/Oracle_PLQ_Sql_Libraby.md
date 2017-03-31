@@ -18,3 +18,7 @@ Some [PL/SQL Utils](https://github.com/mortenbra/alexandria-plsql-utils)
 # Tracing
 
 [How to set trace for others sessions, for your own session and at instance level](http://www.petefinnigan.com/ramblings/how_to_set_trace.htm)
+
+# Documentations
+
+[pldoc](http://pldoc.sourceforge.net/maven-site/) is an open-source utility for generating HTML documentation of code written in Oracle PL/SQL.
