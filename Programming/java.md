@@ -11,3 +11,6 @@ http://magicmonster.com/kb/prg/java/ssl/pkix_path_building_failed.html
 ```
 "c:\Program Files\Java\jre1.8.0_144\bin\keytool.exe" -import -alias example -keystore  "c:\Program Files\Java\jdk1.8.0_144\jre\lib\security\cacerts" -file d:\Temp\20171215\initializr.cer
 ```
+
+
+
